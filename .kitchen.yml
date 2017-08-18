@@ -11,6 +11,7 @@ driver:
     memory: <%= ENV['VB_MEM'] || 4096 %>
   network:
     - ['forwarded_port', {guest: 2375, host: 2375}]
+    - ['forwarded_port', {guest: 3128, host: 3128}]
 
 transport:
   name: rsync
