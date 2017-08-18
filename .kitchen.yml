@@ -2,14 +2,18 @@
 
 driver:
   name: vagrant
-  network:
-  - ['private_network', {ip: '192.168.99.100'}]
+  provider: veertu
+  vagrantfiles:
+    - veertu.rb
   customize:
     name: kitchen-docker-host
     cpus: <%= ENV['VB_CPUS'] || 4 %>
     memory: <%= ENV['VB_MEM'] || 4096 %>
-    nictype1: virtio
-    nictype2: virtio
+  network:
+    - ['forwarded_port', {guest: 2375, host: 2375}]
+
+transport:
+  name: rsync
 
 provisioner:
   name: chef_zero
@@ -17,6 +21,9 @@ provisioner:
 
 platforms:
 - name: centos-7.3
+  driver:
+    box: SaltwaterC/centos-7.3
+
 
 suites:
 - name: kdh
