@@ -4,13 +4,14 @@ Docker host as Vagrant box created with [kitchen-docker](https://github.com/port
 
 The machine is also implemented using Test Kitchen using the kitchen-vagrant driver. It used to be implemented with Vagrant and vagrant-berkshelf, however, vagrant-berkshelf has the bad habit of breaking quite often.
 
-All the required gems are supplied by ChefDK.
+This branch uses Veertu Desktop rather than VirtualBox.
 
 ## Dependencies
 
  * [ChefDK](https://downloads.chef.io/chef-dk/) 2+
- * [VirtualBox](https://www.virtualbox.org)
+ * [Veertu Desktop](https://veertu.com/veertu-desktop/)
  * [Vagrant](https://www.vagrantup.com) 1.9.2+
+ * [vagrant-veertu](https://github.com/veertuinc/vagrant-veertu) Vagrant plug-in
  * [Docker](https://www.docker.com) client
 
 ```bash
@@ -25,13 +26,16 @@ For starting the VM, simply issue a `rake up` command in the root directory of t
 
 By default, it uses 4 virtual cores and 4096 GB of RAM and zram support. Export VB_CPUS and / or VB_MEM environment variables with the desired values to customize.
 
-The VM itself uses a host-only network adapter with the IP address 192.168.99.100. This makes it sort of a drop-in replacement for docker-machine. The Docker socket isn't TLS enabled though.
+The VM itself uses a shared network adapter with the IP address exported as the environment variable KDH_IP (see setup instruction below).
 
 To tell the Docker client where to find the host, simply:
 
 ```bash
-export DOCKER_HOST=tcp://192.168.99.100:2375
+source ~/.kdh-ip
+export DOCKER_HOST=tcp://$KDH_IP:2375
 ```
+
+The .kdh-ip file is created by `rake up` (alias of `converge`) or `rake converge`.
 
 To check whether the Docker connection is OK:
 
@@ -85,12 +89,12 @@ To use the Squid caching proxy you need to tell Test Kitchen to use http_proxy.
 ```yml
 driver:
   name: docker
-  http_proxy: http://192.168.99.100:3128
+  http_proxy: http://<%= ENV['KDH_IP'] %>:3128
 
 provisioner:
   chef_omnibus_url: http://www.opscode.com/chef/install.sh
   client_rb:
-    http_proxy: http://192.168.99.100:3128
+    http_proxy: http://<%= ENV['KDH_IP'] %>:3128
 ```
 
 The only thing that doesn't seem to belong here is chef_omnibus_url. However, the Omnibus installer defaults to HTTPS, unless the URL to install.sh uses HTTP. This allows Squid to cache the Chef package which is quite large at ~40 MB.

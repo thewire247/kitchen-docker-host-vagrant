@@ -74,8 +74,10 @@ task up: %i[converge]
 
 desc 'kitchen converge'
 task :converge do
+  sh 'bundle install'
   kitchen_vagrant_exec 'up' unless Dir['.kitchen/**/Vagrantfile'].empty?
   sh 'kitchen converge'
+  Rake::Task[:kdh_ip].execute
 end
 
 desc 'kitchen verify'
@@ -93,3 +95,22 @@ end
 
 desc 'Runs static code analysis tools'
 task lint: %i[rubocop foodcritic]
+
+desc 'Generates the .kdh-ip file'
+task :kdh_ip do
+  # get kitchen-docker-host IP from Veertu
+  require 'ursa'
+
+  ursa = Ursa.new
+  ursa.tell(ursa.app('Veertu Desktop'), 'get {id,name} of every vm')
+  machines = ursa.execute_script.split(',').collect(&:strip)
+
+  vm_id = machines.index('kitchen-docker-host') - (machines.length / 2)
+  vm_id = machines[vm_id]
+
+  ursa.tell(ursa.app('Veertu Desktop'), %(get {ip} of vm id "#{vm_id}"))
+  ip = ursa.execute_script.strip
+
+  puts "Found IP #{ip} for VM ID #{vm_id}"
+  File.write("#{ENV['HOME']}/.kdh-ip", "export KDH_IP=#{ip}\n")
+end
