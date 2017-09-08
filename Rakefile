@@ -74,7 +74,11 @@ task up: %i[converge]
 
 desc 'kitchen converge'
 task :converge do
+  require 'rubygems'
+
   sh 'bundle install'
+  Gem.clear_paths
+
   kitchen_vagrant_exec 'up' unless Dir['.kitchen/**/Vagrantfile'].empty?
   sh 'kitchen converge'
   Rake::Task[:kdh_ip].execute
