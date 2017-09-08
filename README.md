@@ -14,10 +14,6 @@ The machine is also implemented using Test Kitchen using the kitchen-vagrant dri
  * [vagrant-veertu](https://github.com/veertuinc/vagrant-veertu) Vagrant plug-in
  * [Docker](https://www.docker.com) client
 
-```bash
-rake setup
-```
-
 Vagrant 1.9.2+ is required. The previous versions (up to 1.9) stopped working properly with Atlas.
 
 ## How to use
