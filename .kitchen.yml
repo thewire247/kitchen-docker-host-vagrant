@@ -18,9 +18,9 @@ provisioner:
   require_chef_omnibus: <%= CHEF_VERSION %>
 
 platforms:
-- name: centos-7.3
+- name: centos-7.4
   driver:
-    box: SaltwaterC/centos-7.3
+    box: SaltwaterC/centos-7.4
 
 suites:
 - name: kdh

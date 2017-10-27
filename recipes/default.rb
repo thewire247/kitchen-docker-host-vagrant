@@ -52,4 +52,8 @@ service 'zram' do
   action %i[enable start]
 end
 
+service 'firewalld' do
+  action %i[stop disable]
+end
+
 include_recipe 'selinux::disabled'
