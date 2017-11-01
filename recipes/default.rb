@@ -37,6 +37,7 @@ end
 ].each do |param|
   sysctl_param param do
     value 1
+    notifies :restart, 'service[docker]', :delayed
   end
 end
 
@@ -54,6 +55,11 @@ end
 
 service 'firewalld' do
   action %i[stop disable]
+  notifies :restart, 'service[docker]', :delayed
+end
+
+service 'docker' do
+  action %i[enable start]
 end
 
 include_recipe 'selinux::disabled'
