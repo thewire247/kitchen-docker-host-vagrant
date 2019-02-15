@@ -9,12 +9,30 @@ include_recipe 'yum-epel::default'
 
 package %w[htop squid bc]
 
+remote_file '/etc/yum.repos.d/docker-ce.repo' do
+  source 'https://download.docker.com/linux/centos/docker-ce.repo'
+  owner 'root'
+  group 'root'
+  mode '0644'
+  action :create
+end
+
+package 'docker-ce' do # ~FC009
+  flush_cache [:before]
+  version '18.09.2-3.el7'
+end
+
 docker_service 'default' do
+  install_method 'none'
   host %w[tcp://0.0.0.0:2375]
   bip '172.17.42.1/16'
   storage_driver 'devicemapper'
   storage_opts %w[dm.basesize=20G]
   action %i[create start]
+end
+
+service 'docker' do
+  action %i[start enable]
 end
 
 cookbook_file '/etc/squid/squid.conf' do
